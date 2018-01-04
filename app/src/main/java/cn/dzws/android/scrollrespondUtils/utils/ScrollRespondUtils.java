@@ -56,6 +56,11 @@ public class ScrollRespondUtils {
         mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
     }
 
+    /**
+     * 响应滑动的View
+     * @param view
+     * @return
+     */
     public ScrollRespondUtils setRespondView(View view) {
         this.targetView = view;
         targetView.post(new Runnable() {
