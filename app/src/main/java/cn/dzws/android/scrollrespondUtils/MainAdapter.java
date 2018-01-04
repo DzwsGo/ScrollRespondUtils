@@ -1,0 +1,40 @@
+package cn.dzws.android.scrollrespondUtils;
+
+import android.content.Context;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+/**
+ * @author Lwang
+ * @time 2018/1/2.
+ */
+
+public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainHolder> {
+
+
+    @Override
+    public MainHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Context context = parent.getContext();
+        View inflate = LayoutInflater.from(context).inflate(R.layout.activity_item, null);
+        return new MainHolder(inflate);
+    }
+
+    @Override
+    public void onBindViewHolder(MainHolder holder, int position) {
+
+    }
+    @Override
+    public int getItemCount() {
+        return 30;
+    }
+
+    public class MainHolder extends RecyclerView.ViewHolder{
+
+        public MainHolder(View itemView) {
+            super(itemView);
+        }
+    }
+
+}
