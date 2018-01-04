@@ -1,2 +1,5 @@
 # ScrollRespondUtils
 滑动响应工具类
+目前支持RecyclerView和ScrollView的滑动响应
+1、RecyclerView example
+2、ScrollView example
