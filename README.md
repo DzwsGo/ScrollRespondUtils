@@ -13,24 +13,25 @@
 
 * 使用
 
-`
+
 //初始化
+
 
 ScrollRespondUtils scrollRespondUtils = new ScrollRespondUtils(this);
 
 //设置响应滑动的View
 
+
 scrollRespondUtils.setRespondView(rlBottom);
 
 //调用start响应
 
+
 scrollRespondUtils.start(view,i,i1,i2,i3);
 
-`
 
 1、RecyclerView
 
-`
 
     recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
         @Override
@@ -45,11 +46,9 @@ scrollRespondUtils.start(view,i,i1,i2,i3);
         }
     });
 
-    `
 
 2、ScrollView
 
-`
 
     scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
         @Override
@@ -58,5 +57,5 @@ scrollRespondUtils.start(view,i,i1,i2,i3);
             scrollRespondUtils.start(view,i,i1,i2,i3);
         }
     });
+
     
-`
