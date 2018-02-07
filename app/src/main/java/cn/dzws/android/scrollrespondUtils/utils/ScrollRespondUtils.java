@@ -37,6 +37,9 @@ public class ScrollRespondUtils {
 
     private boolean viewVisible = true;
     private int targetViewTop;
+    private int targetViewLeft;
+    private ValueAnimator visableDropAnimator;
+    private ValueAnimator closeDropAnimator;
 
 
     /**
@@ -70,7 +73,8 @@ public class ScrollRespondUtils {
                 targetViewHeight = targetView.getHeight();
                 targetViewWidth = targetView.getWidth();
                 targetHeightStrat = getScreenHeight() - targetViewHeight - 100;
-                Log.d(TAG, "onScrolled targetViewHeight : " + targetViewHeight + " targetViewWidth : " + targetViewWidth + " targetHeightStrat : " + targetHeightStrat + " height : " + getScreenHeight() + " targetViewTop : " + targetViewTop);
+                targetViewLeft = targetView.getLeft();
+                Log.d(TAG, "onScrolled targetViewHeight : " + targetViewHeight + " targetViewWidth : " + targetViewWidth + " targetHeightStrat : " + targetHeightStrat + " height : " + getScreenHeight() + " targetViewTop : " + targetViewTop + " targetViewLeft : " + targetViewLeft);
 
             }
         });
@@ -106,7 +110,6 @@ public class ScrollRespondUtils {
         do {
             if (dy > 0) { //向上
                 if (dy > mTouchSlop) { //隐藏
-                    Log.d(TAG, "start dy : " + dy + " !closeStart : " + !closeStart);
                     if (!closeStart && viewVisible) {
                         close();
                     }
@@ -115,8 +118,6 @@ public class ScrollRespondUtils {
             }
             if (dy < 0) { //向下
                 if (Math.abs(dy) > mTouchSlop) {
-                    Log.d(TAG, "start dy : " + dy + " !viewVisible && (!visibleStart || newState == 0) : " + (!viewVisible && (!visibleStart)));
-                    Log.d(TAG, "start dy : " + dy + " !viewVisible  : " + !viewVisible + " !visibleStart : " + !visibleStart);
                     if (!viewVisible && !visibleStart) {
                         visible();
                     }
@@ -187,8 +188,8 @@ public class ScrollRespondUtils {
     }
 
     private void visible() {
-        ValueAnimator dropAnimator = createDropAnimator(targetView, getScreenHeight(), targetViewTop);
-        dropAnimator.addListener(new Animator.AnimatorListener() {
+        visableDropAnimator = createDropAnimator(targetView, getScreenHeight(), targetViewTop);
+        visableDropAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
                 Log.d(TAG, "visible onAnimationStart");
@@ -208,7 +209,9 @@ public class ScrollRespondUtils {
 
             @Override
             public void onAnimationCancel(Animator animator) {
-
+                Log.d(TAG, "visible onAnimationCancel");
+                visibleStart = false;
+                viewVisible = true;
             }
 
             @Override
@@ -216,13 +219,18 @@ public class ScrollRespondUtils {
 
             }
         });
-        dropAnimator.start();
+        if(!visableDropAnimator.isRunning()) {
+            visableDropAnimator.start();
+            if(closeDropAnimator != null) {
+                closeDropAnimator.cancel();
+            }
+        }
     }
 
     public void close() {
-        ValueAnimator dropAnimator = createDropAnimator(targetView, targetViewTop, getScreenHeight());
-        dropAnimator.setDuration(1000);
-        dropAnimator.addListener(new Animator.AnimatorListener() {
+        closeDropAnimator = createDropAnimator(targetView, targetViewTop, getScreenHeight());
+        closeDropAnimator.setDuration(1000);
+        closeDropAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
                 closeStart = true;
@@ -242,7 +250,9 @@ public class ScrollRespondUtils {
 
             @Override
             public void onAnimationCancel(Animator animation) {
-
+                Log.d(TAG, "close onAnimationCancel");
+                closeStart = false;
+                viewVisible = false;
             }
 
             @Override
@@ -250,7 +260,12 @@ public class ScrollRespondUtils {
 
             }
         });
-        dropAnimator.start();
+        if(!closeDropAnimator.isRunning()) {
+            closeDropAnimator.start();
+            if(visableDropAnimator != null) {
+                visableDropAnimator.cancel();
+            }
+        }
     }
 
     private ValueAnimator createDropAnimator(final View view, int start, int end) {
@@ -259,11 +274,8 @@ public class ScrollRespondUtils {
                 new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                        //   int value = (Integer)valueAnimator.getAnimatedValue();
                         int value = (Integer) valueAnimator.getAnimatedValue();// 得到的值
-                        int height = view.getHeight();
-                        Log.d(TAG, "onAnimationUpdate value : " + value + " height : " + height);
-                        view.layout(0, value, targetViewWidth, value + targetViewHeight);
+                        view.layout(targetViewLeft, value, targetViewWidth, value + targetViewHeight);
                     }
                 }
         );
