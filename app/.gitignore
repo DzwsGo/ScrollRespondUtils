@@ -38,3 +38,27 @@ Thumbs.db
 
 #NDK
 obj/
+
+*.iml
+.gradle
+/local.properties
+.DS_Store
+/build
+
+*.apk
+*.dex
+bin/
+gen/
+out/
+build/
+.idea/
+.DS_Store
+
+.classpath
+.project
+
+
+
+
+
+

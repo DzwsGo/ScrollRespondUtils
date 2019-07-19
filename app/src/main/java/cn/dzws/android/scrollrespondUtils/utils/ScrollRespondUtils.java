@@ -32,13 +32,11 @@ public class ScrollRespondUtils {
     private int targetHeightStrat;
     private boolean closeStart = false;
     private boolean visibleStart = false;
-//    private int newState;
-
 
     private boolean viewVisible = true;
     private int targetViewTop;
     private int targetViewLeft;
-    private ValueAnimator visableDropAnimator;
+    private ValueAnimator viableDropAnimator;
     private ValueAnimator closeDropAnimator;
 
 
@@ -49,8 +47,10 @@ public class ScrollRespondUtils {
      */
     public int getScreenHeight() {
         WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics dm = new DisplayMetrics();// 创建了一张白纸
-        windowManager.getDefaultDisplay().getMetrics(dm);// 给白纸设置宽高
+        // 创建了一张白纸
+        DisplayMetrics dm = new DisplayMetrics();
+        // 给白纸设置宽高
+        windowManager.getDefaultDisplay().getMetrics(dm);
         return dm.heightPixels;
     }
 
@@ -61,6 +61,7 @@ public class ScrollRespondUtils {
 
     /**
      * 响应滑动的View
+     *
      * @param view
      * @return
      */
@@ -72,7 +73,7 @@ public class ScrollRespondUtils {
                 targetViewTop = targetView.getTop();
                 targetViewHeight = targetView.getHeight();
                 targetViewWidth = targetView.getWidth();
-                targetHeightStrat = getScreenHeight() - targetViewHeight - 100;
+                targetHeightStrat = getScreenHeight() - targetViewHeight;
                 targetViewLeft = targetView.getLeft();
                 Log.d(TAG, "onScrolled targetViewHeight : " + targetViewHeight + " targetViewWidth : " + targetViewWidth + " targetHeightStrat : " + targetHeightStrat + " height : " + getScreenHeight() + " targetViewTop : " + targetViewTop + " targetViewLeft : " + targetViewLeft);
 
@@ -89,6 +90,7 @@ public class ScrollRespondUtils {
 
     /**
      * ScrollView
+     *
      * @param view
      * @param x
      * @param y
@@ -97,44 +99,64 @@ public class ScrollRespondUtils {
      * @return
      */
     public ScrollRespondUtils start(View view, int x, int y, int oldX, int oldY) {
-       return start(y - oldY);
+        return start(y - oldY);
     }
 
     /**
      * RecyclerView
+     *
      * @param dy
      * @return
      */
     public ScrollRespondUtils start(int dy) {
 
         do {
-            if (dy > 0) { //向上
-                if (dy > mTouchSlop) { //隐藏
+            //向上
+            if (dy > 0) {
+                if (dy > mTouchSlop) {
+                    //隐藏
                     if (!closeStart && viewVisible) {
+                        Log.e(TAG, "ScrollRespondUtils start close");
                         close();
                     }
                 }
                 break;
             }
-            if (dy < 0) { //向下
+            //向下
+            if (dy < 0) {
                 if (Math.abs(dy) > mTouchSlop) {
                     if (!viewVisible && !visibleStart) {
+                        Log.e(TAG, "ScrollRespondUtils start visible");
                         visible();
                     }
                 }
                 break;
             }
+
+            Log.d(TAG, "ScrollRespondUtils start else ");
+
         } while (false);
         return this;
     }
 
     private ScrollRespondUtils isStop(int newState) {
-//        this.newState = newState;
+        //        this.newState = newState;
         if (newState == 0) {
             int temp = -(mTouchSlop + 1);
-//            start(temp);
+            //            start(temp);
         }
         return this;
+    }
+
+    /**
+     * 点击隐藏，显示
+     */
+    public void onClickEvent() {
+        if (viewVisible) {
+            close();
+        } else {
+            visible();
+        }
     }
 
     public ScrollRespondUtils start(MotionEvent event) {
@@ -180,7 +202,7 @@ public class ScrollRespondUtils {
             case MotionEvent.ACTION_CANCEL:
                 // 初始化标记
                 break;
-
+            default:
         }
 
 
@@ -188,8 +210,8 @@ public class ScrollRespondUtils {
     }
 
     private void visible() {
-        visableDropAnimator = createDropAnimator(targetView, getScreenHeight(), targetViewTop);
-        visableDropAnimator.addListener(new Animator.AnimatorListener() {
+        viableDropAnimator = createDropAnimator(targetView, getScreenHeight(), targetViewTop);
+        viableDropAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
                 Log.d(TAG, "visible onAnimationStart");
@@ -219,15 +241,15 @@ public class ScrollRespondUtils {
 
             }
         });
-        if(!visableDropAnimator.isRunning()) {
-            visableDropAnimator.start();
-            if(closeDropAnimator != null) {
+        if (!viableDropAnimator.isRunning()) {
+            viableDropAnimator.start();
+            if (closeDropAnimator != null) {
                 closeDropAnimator.cancel();
             }
         }
     }
 
-    public void close() {
+    private void close() {
         closeDropAnimator = createDropAnimator(targetView, targetViewTop, getScreenHeight());
         closeDropAnimator.setDuration(1000);
         closeDropAnimator.addListener(new Animator.AnimatorListener() {
@@ -251,6 +273,7 @@ public class ScrollRespondUtils {
             @Override
             public void onAnimationCancel(Animator animation) {
                 Log.d(TAG, "close onAnimationCancel");
+
                 closeStart = false;
                 viewVisible = false;
             }
@@ -260,10 +283,10 @@ public class ScrollRespondUtils {
 
             }
         });
-        if(!closeDropAnimator.isRunning()) {
+        if (!closeDropAnimator.isRunning()) {
             closeDropAnimator.start();
-            if(visableDropAnimator != null) {
-                visableDropAnimator.cancel();
+            if (viableDropAnimator != null) {
+                viableDropAnimator.cancel();
             }
         }
     }
@@ -271,16 +294,16 @@ public class ScrollRespondUtils {
     private ValueAnimator createDropAnimator(final View view, int start, int end) {
         ValueAnimator animator = ValueAnimator.ofInt(start, end);
         animator.addUpdateListener(
-                new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                        int value = (Integer) valueAnimator.getAnimatedValue();// 得到的值
-                        view.layout(targetViewLeft, value, targetViewWidth, value + targetViewHeight);
-                    }
+            new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    // 得到的值
+                    int value = (Integer) valueAnimator.getAnimatedValue();
+                    view.layout(targetViewLeft, value, targetViewWidth, value + targetViewHeight);
                 }
+            }
         );
         return animator;
     }
-
 
 }
