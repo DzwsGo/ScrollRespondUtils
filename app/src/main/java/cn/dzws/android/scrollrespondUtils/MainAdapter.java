@@ -34,7 +34,38 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainHolder> {
 
         public MainHolder(View itemView) {
             super(itemView);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) {
+                    if (onItemClickListener != null) {
+                        onItemClickListener.onItemClick(v, getLayoutPosition());
+                    }
+                }
+            });
         }
     }
+
+    /**
+     * 点击 RecyclerView 某条的监听
+     */
+    public interface OnItemClickListener {
+
+        /**
+         * 当RecyclerView某个被点击的时候回调
+         *
+         * @param view 点击item的视图
+         * @param position 点击得到的position
+         */
+        void onItemClick(View view, int position);
+    }
+
+    private OnItemClickListener onItemClickListener;
+
+    /**
+     * 设置RecyclerView某个的监听
+     */
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+
 
 }
